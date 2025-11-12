@@ -14,24 +14,26 @@ export const useAuthStore = defineStore('auth', () => {
   const currentUser = computed(() => user.value)
   const hasToken = computed(() => !!token.value)
 
-  // Actions
-  const login = async (email, password) => {
-    isLoading.value = true
-    error.value = null
-    
-    try {
-      const response = await authService.login({ email, password })
-      token.value = response.token
-      user.value = response.user
-      localStorage.setItem('token', response.token)
-      return response
-    } catch (err) {
-      error.value = err.response?.data?.message || 'Login failed'
-      throw err
-    } finally {
-      isLoading.value = false
-    }
+
+const login = async (email, password) => {
+  isLoading.value = true
+  error.value = null
+  
+  try {
+    const response = await authService.login({ email, password })
+
+    token.value = response.data?.token || response.token
+    user.value = response.data?.user || response.user
+    localStorage.setItem('token', token.value)
+    return response
+  } catch (err) {
+    error.value = err.response?.data?.message || 'Login failed'
+    throw err
+  } finally {
+    isLoading.value = false
   }
+}
+
 
   const register = async (userData) => {
     isLoading.value = true
